@@ -1,13 +1,13 @@
 ///////////////////////////////////////////////////////////////////////
-///dit script code is geschreven door Michiel Dirks voor MBO Utrecht///
+///This script is written by Michiel Dirks for MBO Utrecht          ///
 ///                                                                 ///
-///Dit script valt onder de MIT licentie                            ///
+///This script falls under the MIT licens                           ///
 ///////////////////////////////////////////////////////////////////////
 
 const float temperatureMin = 15;
 const float temperatureMax = 30;
-const float humidityMin = 20;
-const float humidityMax = 70;
+const float humidityMin = 5;
+const float humidityMax = 40;
 
 float Temperature;
 float Humidity;
@@ -69,7 +69,7 @@ void loop() {
     showTemp();
   }
   else if (showState == 2) {
-  showHumidity();
+    showHumidity();
   }
   else if (showState == 3) {
     rotate();
@@ -93,7 +93,7 @@ void showTemp() {
   }
 }
 
-void showHumidity(){
+void showHumidity() {
   for (int x = 0; x <= 11; x++) {
     strip.SetPixelColor(x, black);
   }
@@ -108,10 +108,10 @@ void showHumidity(){
     strip.SetPixelColor(x, RgbColor(r, g, 0));
     strip.Show();
   }
-  }
+}
 
 void rotate() {
-    for (int x = 0; x <= 11; x++) {
+  for (int x = 0; x <= 11; x++) {
     strip.SetPixelColor(x, black);
   }
   strip.Show();
@@ -140,7 +140,7 @@ float mapf(float x, float in_min, float in_max, float out_min, float out_max) {
   return (x - in_min) * (out_max - out_min) / (in_max - in_min) + out_min;
 }
 
-ISR(PCINT2_vect){
+ISR(PCINT2_vect) {
   if (digitalRead(ButtonHumidity) == LOW) {
     if (digitalRead(ButtonTemperature) == LOW) {
       showState = 3;
@@ -152,4 +152,4 @@ ISR(PCINT2_vect){
   else if (digitalRead(ButtonTemperature) == LOW) {
     showState = 1;
   }
-  }
+}
