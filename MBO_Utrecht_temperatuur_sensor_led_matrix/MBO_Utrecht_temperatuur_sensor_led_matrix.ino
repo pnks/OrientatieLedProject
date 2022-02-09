@@ -7,6 +7,8 @@
 // Temperature from 20 deg center, 3 degs up/down per led (boils down to 2 - 38 degrees
 const float temperatureMin = 20-(3*6);
 const float temperatureMax = 20+(3*6);
+const float temperatureCompensation = -4; // subtract some degrees to compensate for inaccuracy
+
 // Humidity goes the full scale
 const float humidityMin = 0;
 const float humidityMax = 100;
@@ -56,7 +58,7 @@ void loop() {
   static float prevHumidity = -1;
   static float prevTemperature = -273;
   float Humidity = dht.readHumidity();
-  float Temperature = dht.readTemperature();
+  float Temperature = dht.readTemperature() + temperatureCompensation;
   if (isnan(Humidity) || isnan(Temperature)) {
     Serial.println(F("Failed to read from DHT sensor!"));
     return;
