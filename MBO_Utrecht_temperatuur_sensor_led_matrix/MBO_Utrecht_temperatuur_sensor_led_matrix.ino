@@ -1,13 +1,15 @@
 ///////////////////////////////////////////////////////////////////////
 ///This script is written by Michiel Dirks for MBO Utrecht          ///
-///                                                                 ///
+///Extended by P.M. Kuipers                                                                 ///
 ///This script falls under the MIT licens                           ///
 ///////////////////////////////////////////////////////////////////////
 
-const float temperatureMin = 15;
-const float temperatureMax = 30;
-const float humidityMin = 5;
-const float humidityMax = 40;
+// Temperature from 20 deg center, 3 degs up/down per led (boils down to 2 - 38 degrees
+const float temperatureMin = 20-(3*6);
+const float temperatureMax = 20+(3*6);
+// Humidity goes the full scale
+const float humidityMin = 0;
+const float humidityMax = 100;
 
 float Temperature;
 float Humidity;
@@ -19,10 +21,11 @@ float Humidity;
 #define NeoPixelPin 2
 #define PixelCount 12
 #define DHTTYPE DHT11
-#define ButtonHumidity 4
-#define ButtonTemperature 5
+#define ButtonHumidity 5
+#define ButtonTemperature 4
 #define colorSaturation 128
-byte showState = 0;
+byte showState = 1;
+byte prevState = 0;
 
 DHT dht(DHTPIN, DHTTYPE);
 NeoPixelBus<NeoGrbFeature, Neo800KbpsMethod> strip(PixelCount, NeoPixelPin);
@@ -50,27 +53,43 @@ void setup() {
 }
 
 void loop() {
-  delay(200);
-  Humidity = dht.readHumidity();
-  Temperature = dht.readTemperature();
-
+  static float prevHumidity = -1;
+  static float prevTemperature = -273;
+  float Humidity = dht.readHumidity();
+  float Temperature = dht.readTemperature();
   if (isnan(Humidity) || isnan(Temperature)) {
     Serial.println(F("Failed to read from DHT sensor!"));
     return;
   }
+  else {
+    Serial.print(Temperature);
+    Serial.print(",");
+    Serial.println(Humidity);
+  }
 
   if (showState == 1) {
-    showTemp();
+    if(prevState != 1 || fabs(Temperature - prevTemperature) > 1){
+      prevState = 1;
+      prevTemperature = Temperature;
+      showTemp(Temperature);
+    }
   }
   else if (showState == 2) {
-    showHumidity();
+    if(prevState != 2 || fabs(Humidity - prevHumidity) > 1){
+      prevState = 2;
+      prevHumidity = Humidity;
+      showHumidity(Humidity);
+    }
   }
   else if (showState == 3) {
+    prevState = 3;
     rotate();
   }
+
+  delay(500);
 }
 
-void showTemp() {
+void showTemp(float Temperature) {
   for (int x = 0; x <= 11; x++) {
     strip.SetPixelColor(x, black);
   }
@@ -80,14 +99,14 @@ void showTemp() {
     if (showLeds > 12) {
       showLeds = 12;
     }
-    int g = map(x, 0, 11, 20, 255);
-    int b = g * -1;
-    strip.SetPixelColor(x, RgbColor(0, g, b));
+    int r = map(x, 0, 11, 20, 255);
+    int g = r * -1;
+    strip.SetPixelColor(x, RgbColor(r, g, 0));
     strip.Show();
   }
 }
 
-void showHumidity() {
+void showHumidity(float Humidity) {
   for (int x = 0; x <= 11; x++) {
     strip.SetPixelColor(x, black);
   }
@@ -97,9 +116,9 @@ void showHumidity() {
     if (showLeds > 12) {
       showLeds = 12;
     }
-    int r = map(x, 0, 11, 20, 255);
-    int g = r * -1;
-    strip.SetPixelColor(x, RgbColor(r, g, 0));
+    int g = map(x, 0, 11, 20, 255);
+    int b = g * -1;
+    strip.SetPixelColor(x, RgbColor(0, g, b));
     strip.Show();
   }
 }
