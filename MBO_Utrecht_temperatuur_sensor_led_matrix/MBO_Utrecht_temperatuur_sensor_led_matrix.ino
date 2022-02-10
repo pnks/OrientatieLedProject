@@ -1,20 +1,17 @@
 ///////////////////////////////////////////////////////////////////////
 ///This script is written by Michiel Dirks for MBO Utrecht          ///
-///Extended by P.M. Kuipers                                                                 ///
+///Extended by P.M. Kuipers                                         ///
 ///This script falls under the MIT licens                           ///
 ///////////////////////////////////////////////////////////////////////
 
 // Temperature from 20 deg center, 3 degs up/down per led (boils down to 2 - 38 degrees
-const float temperatureMin = 20-(3*6);
-const float temperatureMax = 20+(3*6);
+const float temperatureMin = 20 - (3 * 6);
+const float temperatureMax = 20 + (3 * 6);
 const float temperatureCompensation = -4; // subtract some degrees to compensate for inaccuracy
 
 // Humidity goes the full scale
 const float humidityMin = 0;
 const float humidityMax = 100;
-
-float Temperature;
-float Humidity;
 
 #include <NeoPixelBus.h>
 #include <DHT.h>
@@ -70,14 +67,14 @@ void loop() {
   }
 
   if (showState == 1) {
-    if(prevState != 1 || fabs(Temperature - prevTemperature) > 1){
+    if (prevState != 1 || fabs(Temperature - prevTemperature) > 1) {
       prevState = 1;
       prevTemperature = Temperature;
       showTemp(Temperature);
     }
   }
   else if (showState == 2) {
-    if(prevState != 2 || fabs(Humidity - prevHumidity) > 1){
+    if (prevState != 2 || fabs(Humidity - prevHumidity) > 1) {
       prevState = 2;
       prevHumidity = Humidity;
       showHumidity(Humidity);
@@ -133,7 +130,7 @@ void rotate() {
   int color = 0;
   for (int x = 0; x <= 11; x++) {
     color++;
-    if (color == 4) {
+    if (color >= 4) {
       color = 1;
     }
     if (color == 1) {
